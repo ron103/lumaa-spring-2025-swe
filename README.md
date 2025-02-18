@@ -179,7 +179,7 @@ REACT_APP_API_URL=http://localhost:5020
 - **Internships:**  
   Hourly compensation is expected to be around $20 to $30 per hour.
 
-These figures reflect market standards for similar roles and responsibilities.
+These figures reflect market standards for similar roles and responsibilities. Open to negotiate.
 
 ## Additional Notes
 
@@ -195,4 +195,5 @@ These figures reflect market standards for similar roles and responsibilities.
 
 Feel free to reach out if you have any questions or need further assistance with the setup.
 
-Happy coding!
+email: rwaghmare@binghamton.edu
+porfolio: https://rohanwaghmare.com/

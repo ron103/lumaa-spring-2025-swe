@@ -193,6 +193,13 @@ These figures reflect market standards for similar roles and responsibilities. O
 - **Extensibility:**  
   Although the project is minimal, its structure allows for easy extension (e.g., splitting the backend into controllers/services, adding more features in the frontend, etc.).
 
+
+## Video Demo Link
+
+After recording, upload your demo video to YouTube (or another platform) and add the link below:
+
+[Video Demo Link](https://drive.google.com/file/d/1MmE1VWRS4iyr757suZpZMbPNqJX7n0GV/view?usp=sharing)
+
 Feel free to reach out if you have any questions or need further assistance with the setup.
 
 email: rwaghmare@binghamton.edu

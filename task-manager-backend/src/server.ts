@@ -1,5 +1,3 @@
-// src/server.ts
-
 import express, { Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
@@ -7,10 +5,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-// Load environment variables from .env file
 dotenv.config();
 
-// Get environment variables
 const PORT = process.env.PORT || 5000;
 const DATABASE_URL = process.env.DATABASE_URL as string;
 const JWT_SECRET = process.env.JWT_SECRET as string;
@@ -20,12 +16,10 @@ if (!DATABASE_URL || !JWT_SECRET) {
   process.exit(1);
 }
 
-// Initialize PostgreSQL pool
 const pool = new Pool({
   connectionString: DATABASE_URL,
 });
 
-// Create Express app
 const app = express();
 
 // Enable CORS to allow cross-origin requests
@@ -34,15 +28,13 @@ app.use(cors());
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Extend Request type to include authenticated user
 interface AuthRequest extends Request {
   user?: { id: number; username: string };
 }
 
-// Authentication middleware
 const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Expected format: "Bearer <token>"
+  const token = authHeader && authHeader.split(' ')[1]; 
 
   if (!token) {
     res.status(401).json({ message: 'Missing token' });

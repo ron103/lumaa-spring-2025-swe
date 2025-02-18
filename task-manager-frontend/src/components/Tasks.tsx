@@ -34,7 +34,6 @@ const Tasks: React.FC<TasksProps> = ({ token }) => {
 
   useEffect(() => {
     fetchTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const handleCreateTask = async (e: React.FormEvent) => {

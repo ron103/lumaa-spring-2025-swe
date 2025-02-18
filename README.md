@@ -203,4 +203,5 @@ After recording, upload your demo video to YouTube (or another platform) and add
 Feel free to reach out if you have any questions or need further assistance with the setup.
 
 email: rwaghmare@binghamton.edu
-porfolio: https://rohanwaghmare.com/
+
+portfolio: https://rohanwaghmare.com/

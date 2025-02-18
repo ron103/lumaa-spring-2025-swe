@@ -1,119 +1,366 @@
-# Full-Stack Coding Challenge
 
-**Deadline**: Sunday, Feb 23th 11:59 pm PST
+# Task Management Application
 
----
+This repository implements a task management application with a backend built in Node.js (Express + TypeScript) using PostgreSQL, and a frontend built in React with TypeScript.
+
+## Table of Contents
+- [Overview](#overview)
+- [Backend Setup](#backend-setup)
+  - [Database Setup](#database-setup)
+  - [Environment Variables for Backend](#environment-variables-for-backend)
+  - [Running the Backend](#running-the-backend)
+- [Frontend Setup](#frontend-setup)
+  - [Environment Variables for Frontend](#environment-variables-for-frontend)
+  - [Running the Frontend](#running-the-frontend)
+- [Testing](#testing)
+- [Salary Expectations](#salary-expectations)
+- [Additional Notes](#additional-notes)
 
 ## Overview
 
-Create a “Task Management” application with **React + TypeScript** (frontend), **Node.js** (or **Nest.js**) (backend), and **PostgreSQL** (database). The application should:
+This project provides a basic Task Management system with the following features:
 
-1. **Register** (sign up) and **Log in** (sign in) users.
-2. After logging in, allow users to:
-   - **View a list of tasks**.
-   - **Create a new task**.
-   - **Update an existing task** (e.g., mark complete, edit).
-   - **Delete a task**.
+- **User Authentication:**  
+  - **Register:** Users can register with a username and password. Passwords are hashed using bcrypt.
+  - **Login:** Registered users log in to receive a JWT token.
 
-Focus on **correctness**, **functionality**, and **code clarity** rather than visual design.  
-This challenge is intended to be completed within ~3 hours, so keep solutions minimal yet functional.
+- **Task Management:**  
+  - All CRUD operations (create, read, update, delete) for tasks are available.
+  - Task endpoints are protected by authentication (JWT).
 
----
-
-## Requirements
-
-### 1. Authentication
-
-- **User Model**:
-  - `id`: Primary key
-  - `username`: Unique string
-  - `password`: Hashed string
-- **Endpoints**:
-  - `POST /auth/register` – Create a new user
-  - `POST /auth/login` – Login user, return a token (e.g., JWT)
-- **Secure the Tasks Routes**: Only authenticated users can perform task operations.  
-  - **Password Hashing**: Use `bcrypt` or another hashing library to store passwords securely.
-  - **Token Verification**: Verify the token (JWT) on each request to protected routes.
-
-### 2. Backend (Node.js or Nest.js)
-
-- **Tasks CRUD**:  
-  - `GET /tasks` – Retrieve a list of tasks (optionally filtered by user).  
-  - `POST /tasks` – Create a new task.  
-  - `PUT /tasks/:id` – Update a task (e.g., mark as complete, edit text).  
-  - `DELETE /tasks/:id` – Delete a task.
-- **Task Model**:
-  - `id`: Primary key
-  - `title`: string
-  - `description`: string (optional)
-  - `isComplete`: boolean (default `false`)
-  - _(Optional)_ `userId` to link tasks to the user who created them
-- **Database**: PostgreSQL
-  - Provide instructions/migrations to set up:
-    - `users` table (with hashed passwords)
-    - `tasks` table
-- **Setup**:
-  - `npm install` to install dependencies
-  - `npm run start` (or `npm run dev`) to run the server
-  - Document any environment variables (e.g., database connection string, JWT secret)
-
-### 3. Frontend (React + TypeScript)
-
-- **Login / Register**:
-  - Simple forms for **Register** and **Login**.
-  - Store JWT (e.g., in `localStorage`) upon successful login.
-  - If not authenticated, the user should not see the tasks page.
-- **Tasks Page**:
-  - Fetch tasks from `GET /tasks` (including auth token in headers).
-  - Display the list of tasks.
-  - Form to create a new task (`POST /tasks`).
-  - Buttons/fields to update a task (`PUT /tasks/:id`).
-  - Button to delete a task (`DELETE /tasks/:id`).
-- **Navigation**:
-  - Show `Login`/`Register` if not authenticated.
-  - Show `Logout` if authenticated.
-- **Setup**:
-  - `npm install` then `npm start` (or `npm run dev`) to run.
-  - Document how to point the frontend at the backend (e.g., `.env` file, base URL).
+The project is intentionally minimal yet functional, and it leverages environment variables for configuration.
 
 ---
 
-## Deliverables
+## Backend Setup
 
-1. **Fork the Public Repository**: **Fork** this repo into your own GitHub account.
-2. **Implement Your Solution** in the forked repository. Make sure you're README file has:
-   - Steps to set up the database (migrations, environment variables).
-   - How to run the backend.
-   - How to run the frontend.
-   - Any relevant notes on testing.
-   - Salary Expectations per month (Mandatory)
-3. **Short Video Demo**: Provide a link (in a `.md` file in your forked repo) to a brief screen recording showing:
-   - Registering a user
-   - Logging in
-   - Creating, updating, and deleting tasks
-4. **Deadline**: Submissions are due **Sunday, Feb 23th 11:59 pm PST**.
+### Database Setup
 
-> **Note**: Please keep your solution minimal. The entire project is intended to be completed in around 3 hours. Focus on core features (registration, login, tasks CRUD) rather than polished UI or extra features.
+1. **Install PostgreSQL**  
+   If you do not have PostgreSQL installed, download and install it from the [PostgreSQL Downloads](https://www.postgresql.org/download/) page.
+
+2. **Create a Database and User**
+
+   Open your terminal and log in as the `postgres` superuser by entering:
+
+psql -U postgres
+
+In the psql prompt, run the following commands:
+
+```sql
+-- Create a new user
+CREATE USER task_user WITH PASSWORD 'task_password';
+
+-- Create a new database
+CREATE DATABASE task_manager;
+
+-- Grant privileges on the new database to the new user
+GRANT ALL PRIVILEGES ON DATABASE task_manager TO task_user;
+
+Then exit psql by typing:
+
+\q
+
+	3.	Create the Required Tables
+Connect to your new database using the newly created user:
+
+psql -U task_user -d task_manager
+
+Then run the following SQL commands:
+
+-- Create the users table
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL
+);
+
+-- Create the tasks table
+CREATE TABLE tasks (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  is_complete BOOLEAN DEFAULT false,
+  user_id INTEGER REFERENCES users(id)
+);
+
+Exit psql by typing:
+
+\q
+
+
+
+Environment Variables for Backend
+
+Create a .env file in the backend root directory with the following content:
+
+PORT=5020
+DATABASE_URL=postgresql://task_user:task_password@localhost:5432/task_manager
+JWT_SECRET=your_jwt_secret_here
+
+Note: Replace your_jwt_secret_here with a secure secret string of your choice.
+
+Running the Backend
+	1.	Install dependencies:
+In your backend directory, run:
+
+npm install
+
+
+	2.	Run the backend server:
+To start the backend server, run:
+
+npm run dev
+
+The server should start and run on http://localhost:5020.
+
+Frontend Setup
+
+Environment Variables for Frontend
+
+In the frontend project directory (e.g., task-manager-frontend), create a .env file with the following content:
+
+REACT_APP_API_URL=http://localhost:5020
+
+Running the Frontend
+	1.	Install dependencies:
+In your frontend directory, run:
+
+npm install
+
+
+	2.	Start the React development server:
+To start the frontend, run:
+
+npm start
+
+The app should open in your browser at http://localhost:3000.
+
+Testing
+	•	Backend Testing:
+Use Postman (or a similar tool) to test API endpoints. Ensure you include the JWT token in the Authorization header (format: Bearer <token>) for protected routes.
+	•	Frontend Testing:
+The React application allows you to register, log in, and perform CRUD operations on tasks. Once logged in, test creating, updating (toggling completion), and deleting tasks using the UI.
+
+Salary Expectations
+	•	Full-Time Positions:
+Salary expectations are in the range of $90,000 to $120,000 per year.
+	•	Internships:
+Hourly compensation is expected to be around $20 to $30 per hour.
+
+These figures reflect market standards for similar roles and responsibilities.
+
+Additional Notes
+	•	Code Quality & Structure:
+	•	The backend is written in TypeScript with clear separation of concerns (authentication middleware, CRUD endpoints).
+	•	The frontend is organized into a few components (AuthForm, Tasks, and the main App), making the project maintainable.
+	•	Environment Variables:
+All sensitive and configurable information is stored in .env files, reducing hard-coded values in the codebase.
+	•	Extensibility:
+Although the project is minimal, its structure allows for easy extension (e.g., splitting the backend into controllers/services, adding more features in the frontend, etc.).
+
+Feel free to reach out if you have any questions or need further assistance with the setup.
+
+Happy coding!
+
+
+```
+
+## Genie
+
+# Task Management Application
+
+This repository implements a task management application with a backend built in Node.js (Express + TypeScript) using PostgreSQL, and a frontend built in React with TypeScript.
+
+## Table of Contents
+- [Overview](#overview)
+- [Backend Setup](#backend-setup)
+  - [Database Setup](#database-setup)
+  - [Environment Variables for Backend](#environment-variables-for-backend)
+  - [Running the Backend](#running-the-backend)
+- [Frontend Setup](#frontend-setup)
+  - [Environment Variables for Frontend](#environment-variables-for-frontend)
+  - [Running the Frontend](#running-the-frontend)
+- [Testing](#testing)
+- [Salary Expectations](#salary-expectations)
+- [Additional Notes](#additional-notes)
+
+## Overview
+
+This project provides a basic Task Management system with the following features:
+
+- **User Authentication:**
+  - **Register:** Users can register with a username and password. Passwords are hashed using bcrypt.
+  - **Login:** Registered users log in to receive a JWT token.
+
+- **Task Management:**
+  - All CRUD operations (Create, Read, Update, Delete) for tasks are available.
+  - Task endpoints are protected by authentication (JWT).
+
+The project is intentionally minimal yet functional, and it leverages environment variables for configuration.
 
 ---
 
-## Evaluation Criteria
+## Backend Setup
 
-1. **Functionality**  
-   - Does registration and login work correctly (with password hashing)?
-   - Are tasks protected by authentication?
-   - Does the tasks CRUD flow work end-to-end?
+### Database Setup
 
-2. **Code Quality**  
-   - Is the code structured logically and typed in TypeScript?
-   - Are variable/function names descriptive?
+1. **Install PostgreSQL**
+   - If you do not have PostgreSQL installed, download and install it from the [PostgreSQL Downloads](https://www.postgresql.org/download/) page.
 
-3. **Clarity**  
-   - Is the `README.md` (in your fork) clear and detailed about setup steps?
-   - Easy to run and test?
+2. **Create a Database and User**
 
-4. **Maintainability**  
-   - Organized logic (controllers/services, etc.)
-   - Minimal hard-coded values
+   Open your terminal and log in as the `postgres` superuser:
 
-Good luck, and we look forward to your submission!
+   ```bash
+   psql -U postgres
+   ```
+
+   In the psql prompt, run the following commands:
+
+   ```sql
+   -- Create a new user
+   CREATE USER task_user WITH PASSWORD 'task_password';
+
+   -- Create a new database
+   CREATE DATABASE task_manager;
+
+   -- Grant privileges on the new database to the user
+   GRANT ALL PRIVILEGES ON DATABASE task_manager TO task_user;
+   ```
+
+   Then exit psql by typing:
+
+   ```bash
+   \q
+   ```
+
+3. **Create the Required Tables**
+
+   Connect to your new database using the newly created user:
+
+   ```bash
+   psql -U task_user -d task_manager
+   ```
+
+   Then run the following SQL commands:
+
+   ```sql
+   -- Create the users table
+   CREATE TABLE users (
+     id SERIAL PRIMARY KEY,
+     username VARCHAR(255) UNIQUE NOT NULL,
+     password VARCHAR(255) NOT NULL
+   );
+
+   -- Create the tasks table
+   CREATE TABLE tasks (
+     id SERIAL PRIMARY KEY,
+     title VARCHAR(255) NOT NULL,
+     description TEXT,
+     is_complete BOOLEAN DEFAULT false,
+     user_id INTEGER REFERENCES users(id)
+   );
+   ```
+
+   Exit psql by typing:
+
+   ```bash
+   \q
+   ```
+
+### Environment Variables for Backend
+
+Create a `.env` file in the backend root directory with the following content:
+
+```plaintext
+PORT=5020
+DATABASE_URL=postgresql://task_user:task_password@localhost:5432/task_manager
+JWT_SECRET=your_jwt_secret_here
+```
+
+**Note:** Replace `your_jwt_secret_here` with a secure secret string of your choice.
+
+### Running the Backend
+
+1. **Install dependencies:**
+
+   In your backend directory, run:
+
+   ```bash
+   npm install
+   ```
+
+2. **Run the backend server:**
+
+   To start the backend server, run:
+
+   ```bash
+   npm run dev
+   ```
+
+   The server should start and run on [http://localhost:5020](http://localhost:5020).
+
+## Frontend Setup
+
+### Environment Variables for Frontend
+
+In the frontend project directory (e.g., `task-manager-frontend`), create a `.env` file with the following content:
+
+```plaintext
+REACT_APP_API_URL=http://localhost:5020
+```
+
+### Running the Frontend
+
+1. **Install dependencies:**
+
+   In your frontend directory, run:
+
+   ```bash
+   npm install
+   ```
+
+2. **Start the React development server:**
+
+   To start the frontend, run:
+
+   ```bash
+   npm start
+   ```
+
+   The app should open in your browser at [http://localhost:3000](http://localhost:3000).
+
+## Testing
+
+- **Backend Testing:**
+  Use Postman (or a similar tool) to test API endpoints. Ensure you include the JWT token in the Authorization header (format: Bearer `<token>`) for protected routes.
+
+- **Frontend Testing:**
+  The React application allows you to register, log in, and perform CRUD operations on tasks. Once logged in, test creating, updating (toggling completion), and deleting tasks using the UI.
+
+## Salary Expectations
+
+- **Full-Time Positions:**  
+  Salary expectations are in the range of $90,000 to $120,000 per year.
+
+- **Internships:**  
+  Hourly compensation is expected to be around $20 to $30 per hour.
+
+These figures reflect market standards for similar roles and responsibilities.
+
+## Additional Notes
+
+- **Code Quality & Structure:**
+  - The backend is written in TypeScript with clear separation of concerns (authentication middleware, CRUD endpoints).
+  - The frontend is organized into a few components (AuthForm, Tasks, and the main App), making the project maintainable.
+
+- **Environment Variables:**  
+  All sensitive and configurable information is stored in `.env` files, reducing hard-coded values in the codebase.
+
+- **Extensibility:**  
+  Although the project is minimal, its structure allows for easy extension (e.g., splitting the backend into controllers/services, adding more features in the frontend, etc.).
+
+Feel free to reach out if you have any questions or need further assistance with the setup.
+
+Happy coding!
